@@ -25,14 +25,9 @@ ignore = [
 "test_*.py" = [
     "S101",    # asserts allowed in tests...
     "ARG",     # Unused function args -> fixtures nevertheless are functionally relevant...
-    "FBT",     # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
-    "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
     "D",
     "ANN"
 ]
-"core/data/error_pages_data.py" = ["E501"] # Line too long due to long error message strings
-"conftest.py" = ["ANN"]
-"tests/conftest.py" = ["ANN"]
 
 [format]
 quote-style = "double"
