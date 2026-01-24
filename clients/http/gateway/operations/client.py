@@ -3,6 +3,8 @@ from typing import TypedDict
 from clients.http.client import HTTPClient
 from httpx import Response, QueryParams
 
+from clients.http.gateway.client import build_gateway_http_client
+
 
 class GetOperationsQueryDict(TypedDict):
     accountId: str
@@ -19,32 +21,85 @@ class MakeOperationRequestDict(TypedDict):
     accountId: str
 
 
+class OperationDict(TypedDict):
+    id: str
+    type: str
+    status: str
+    amount: float
+    cardId: str
+    accountId: str
+    category: str
+    createdAt: str
+
+
+class GetOperationResponseDict:
+    operation: OperationDict
+
+
+class OperationReceiptDict(TypedDict):
+    url: str
+    document: str
+
+class OperationReceiptResponseDict(TypedDict):
+    receipt: OperationReceiptDict
+
+class GetOperationsResponseDict(TypedDict):
+    operations: list[OperationDict]
+
+class OperationsSummaryDict(TypedDict):
+    spentAmount: float
+    receivedAmount: float
+    cashbackAmount: float
+
+class GetOperationsSummaryResponseDict(TypedDict):
+    summary: OperationsSummaryDict
+
 class MakeFeeOperationRequestDict(MakeOperationRequestDict):
     pass
+
+class MakeFeeOperationResponseDict(TypedDict):
+    operation: OperationDict
 
 
 class MakeTopUpOperationRequestDict(MakeOperationRequestDict):
     pass
 
+class MakeTopUpOperationResponseDict(TypedDict):
+    operation: OperationDict
 
 class MakeCashbackOperationRequestDict(MakeOperationRequestDict):
     pass
 
+class MakeCashbackOperationResponseDict(TypedDict):
+    operation: OperationDict
 
 class MakeTransferOperationRequestDict(MakeOperationRequestDict):
     pass
+
+
+class MakeTransferOperationResponseDict(TypedDict):
+    operation: OperationDict
 
 
 class MakePurchaseOperationRequestDict(MakeOperationRequestDict):
     category: str
 
 
+class MakePurchaseOperationResponseDict(TypedDict):
+    operation: OperationDict
+
+
 class MakeBillPaymentOperationRequestDict(MakeOperationRequestDict):
     pass
 
+class MakeBillPaymentOperationResponseDict(TypedDict):
+    operation: OperationDict
 
 class MakeCashWithdrawalOperationRequestDict(MakeOperationRequestDict):
     pass
+
+class MakeCashWithdrawalOperationResponseDict(TypedDict):
+    operation: OperationDict
 
 
 class OperationsGatewayHTTPClient(HTTPClient):
@@ -180,3 +235,101 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Объект httpx.Response с данными по созданной операции снятия наличных
         """
         return self.post("/api/v1/operations/make-cash-withdrawal-operation", json=request)
+
+    def get_operation(self, operation_id: str) -> GetOperationResponseDict:
+        response = self.get_operation_api(operation_id)
+        return response.json()
+
+    def get_operation_receipt(self, operation_id: str) -> OperationReceiptResponseDict:
+        response = self.get_operation_api(operation_id)
+        return response.json()
+
+    def get_operations(self, account_id: str) -> GetOperationsResponseDict:
+        query = GetOperationsQueryDict(accountId=account_id)
+        response = self.get_operations_api(query)
+        return response.json()
+
+    def get_operations_summary(self, account_id: str) -> GetOperationsSummaryResponseDict:
+        query = GetOperationsSummaryQueryDict(accountId=account_id)
+        response = self.get_operations_summary_api(query)
+        return response.json()
+
+    def make_fee_operation(self, card_id: str, account_id: str) -> MakeFeeOperationResponseDict:
+        request = MakeFeeOperationRequestDict(
+            status="COMPLETED",
+            amount=55.77,
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_fee_operation_api(request)
+        return response.json()
+
+    def make_top_up_operation(self, card_id: str, account_id: str) -> MakeTopUpOperationResponseDict:
+        request = MakeTopUpOperationRequestDict(
+            status="COMPLETED",
+            amount=55.77,
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_top_up_operation_api(request)
+        return response.json()
+
+    def make_cashback_operation(self, card_id: str, account_id: str) -> MakeCashbackOperationResponseDict:
+        request = MakeCashbackOperationRequestDict(
+            status="COMPLETED",
+            amount=55.77,
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_cashback_operation_api(request)
+        return response.json()
+
+    def make_transfer_operation(self, card_id: str, account_id: str) -> MakeTransferOperationResponseDict:
+        request = MakeTransferOperationRequestDict(
+            status="COMPLETED",
+            amount=55.77,
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_transfer_operation_api(request)
+        return response.json()
+
+    def make_purchase_operation(self, card_id: str, account_id: str) -> MakePurchaseOperationResponseDict:
+        request = MakePurchaseOperationRequestDict(
+            status="COMPLETED",
+            amount=55.77,
+            cardId=card_id,
+            accountId=account_id,
+            category="some_category"
+        )
+        response = self.make_purchase_operation_api(request)
+        return response.json()
+
+    def make_bill_payment_operation(self, card_id: str, account_id: str) -> MakeBillPaymentOperationResponseDict:
+        request = MakeBillPaymentOperationRequestDict(
+            status="COMPLETED",
+            amount=55.77,
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_bill_payment_operation_api(request)
+        return response.json()
+
+    def make_cash_withdrawal_operation(self, card_id: str, account_id: str) -> MakeCashWithdrawalOperationResponseDict:
+        request = MakeCashWithdrawalOperationRequestDict(
+            status="COMPLETED",
+            amount=55.77,
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_cash_withdrawal_operation_api(request)
+        return response.json()
+
+
+def build_operations_gateway_http_client() -> OperationsGatewayHTTPClient:
+    """
+    Функция создаёт экземпляр OperationsGatewayHTTPClient с уже настроенным HTTP-клиентом.
+
+    :return: Готовый к использованию OperationsGatewayHTTPClient.
+    """
+    return OperationsGatewayHTTPClient(client=build_gateway_http_client())
