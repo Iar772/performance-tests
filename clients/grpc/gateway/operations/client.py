@@ -219,7 +219,7 @@ class OperationsGatewayGRPCClient(GRPCClient):
             card_id=card_id,
             account_id=account_id,
             amount=fake.amount(),
-            status=fake.status(OperationStatus),
+            status=fake.proto_enum(OperationStatus),
         )
         return self.make_fee_operation_api(request)
 
@@ -235,7 +235,7 @@ class OperationsGatewayGRPCClient(GRPCClient):
             card_id=card_id,
             account_id=account_id,
             amount=fake.amount(),
-            status=fake.status(OperationStatus),
+            status=fake.proto_enum(OperationStatus),
         )
         return self.make_top_up_operation_api(request)
 
@@ -251,7 +251,7 @@ class OperationsGatewayGRPCClient(GRPCClient):
             card_id=card_id,
             account_id=account_id,
             amount=fake.amount(),
-            status=fake.status(OperationStatus),
+            status=fake.proto_enum(OperationStatus),
         )
         return self.make_cashback_operation_api(request)
 
@@ -267,7 +267,7 @@ class OperationsGatewayGRPCClient(GRPCClient):
             card_id=card_id,
             account_id=account_id,
             amount=fake.amount(),
-            status=fake.status(OperationStatus),
+            status=fake.proto_enum(OperationStatus),
         )
         return self.make_transfer_operation_api(request)
 
@@ -283,7 +283,7 @@ class OperationsGatewayGRPCClient(GRPCClient):
             card_id=card_id,
             account_id=account_id,
             amount=fake.amount(),
-            status=fake.status(OperationStatus),
+            status=fake.proto_enum(OperationStatus),
             category=fake.category(),
         )
         return self.make_purchase_operation_api(request)
@@ -300,7 +300,7 @@ class OperationsGatewayGRPCClient(GRPCClient):
             card_id=card_id,
             account_id=account_id,
             amount=fake.amount(),
-            status=fake.status(OperationStatus),
+            status=fake.proto_enum(OperationStatus),
         )
         return self.make_bill_payment_operation_api(request)
 
@@ -316,13 +316,13 @@ class OperationsGatewayGRPCClient(GRPCClient):
             card_id=card_id,
             account_id=account_id,
             amount=fake.amount(),
-            status=fake.status(OperationStatus),
+            status=fake.proto_enum(OperationStatus),
         )
         return self.make_cash_withdrawal_operation_api(request)
 
 
 
-def build_users_gateway_grpc_client() -> OperationsGatewayGRPCClient:
+def build_operations_gateway_grpc_client() -> OperationsGatewayGRPCClient:
     """
     Фабрика для создания экземпляра OperationsGatewayGRPCClient.
 
