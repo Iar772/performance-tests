@@ -25,7 +25,7 @@ class GetOperationsTaskSet(GatewayHTTPTaskSet):
         self.seed_user = self.user.environment.seeds.get_random_user()
 
     @task(1)
-    def load_accounts_list(self):
+    def get_accounts(self):
         """
         Получаем список счетов пользователя
         :return:
@@ -33,7 +33,7 @@ class GetOperationsTaskSet(GatewayHTTPTaskSet):
         self.accounts_gateway_client.get_accounts(user_id=self.seed_user.user_id)
 
     @task(2)
-    def load_operations_list(self):
+    def get_operations(self):
         """
         Получаем список операций пользователя по конкретному счету
         :return:
@@ -42,7 +42,7 @@ class GetOperationsTaskSet(GatewayHTTPTaskSet):
 
 
     @task(2)
-    def load_operations_summary_list(self):
+    def get_operations_summary(self):
         """
         Получаем статистику по операциям
         :return:
