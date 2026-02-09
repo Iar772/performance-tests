@@ -27,6 +27,7 @@ from clients.http.gateway.operations.schema import (
     MakeCashWithdrawalOperationResponseSchema,
     MakePurchaseOperationResponseSchema
 )
+from tools.routes import APIRoutes
 
 
 class OperationsGatewayHTTPClient(HTTPClient):
@@ -39,8 +40,8 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Объект httpx.Response с данными по операции
         """
         return self.get(
-            f"/api/v1/operations/{operation_id}",
-            extensions=HTTPClientExtensions(route="/api/v1/operations/{operation_id}")
+            f"{APIRoutes.OPERATIONS}/{operation_id}",
+            extensions=HTTPClientExtensions(route=f"{APIRoutes.OPERATIONS}/{{operation_id}}")
         )
 
     def get_operation_receipt_api(self, operation_id: str) -> Response:
@@ -50,8 +51,8 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Объект httpx.Response с данными по чеку операции
         """
         return self.get(
-            f"/api/v1/operations/operation-receipt/{operation_id}",
-            extensions=HTTPClientExtensions(route="/api/v1/operations/operation-receipt/{operation_id}")
+            f"{APIRoutes.OPERATIONS}/operation-receipt/{operation_id}",
+            extensions=HTTPClientExtensions(route=f"{APIRoutes.OPERATIONS}/operation-receipt/{{operation_id}}")
         )
 
     def get_operations_api(self, query: GetOperationsQuerySchema) -> Response:
@@ -61,9 +62,9 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Объект httpx.Response с данными списков операций для переданного счета
         """
         return self.get(
-            "/api/v1/operations",
+            f"{APIRoutes.OPERATIONS}",
             params=QueryParams(**query.model_dump(by_alias=True)),
-            extensions=HTTPClientExtensions(route="/api/v1/operations")
+            extensions=HTTPClientExtensions(route=f"{APIRoutes.OPERATIONS}")
         )
     def get_operations_summary_api(self, query: GetOperationsSummaryQuerySchema) -> Response:
         """
