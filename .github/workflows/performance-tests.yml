@@ -67,7 +67,8 @@ jobs:
       # 7. Создаём папку, куда будет сохранён HTML-отчёт по результатам теста
       - name: Create report directory
         run: mkdir -p ./reports/${{ github.run_id }}
-      # 8. Создаем переменные окружения
+      # 8. Создаем переменные окружения.Без этого запуск в CI НЕВОЗМОЖЕН,Pydantic ругается при инициализации Settings()
+      # и отсутствия переменных окружения, а тк секреты в CI нельзя именовать числами, такой костыль у всех на виду.
       - name: Create .env for CI
         run: |
           cat > .env <<'EOF'
@@ -81,21 +82,44 @@ jobs:
           GATEWAY_GRPC_CLIENT.PORT=9003
           EOF
       # 9. Запускаем Locust с выбранным конфигурационным файлом и сохраняем HTML-отчёт
-      - name: Run load tests and generate HTML report
+      - name: Run load tests
         run: locust --config=${{ github.event.inputs.SCENARIO }} --html=./reports/${{ github.run_id }}/index.html
 
-      # 10. Деплой HTML-отчёта в GitHub Pages, чтобы можно было посмотреть результаты в браузере
-      - name: Deploy HTML report to GitHub Pages
+      # 10. Сохраняем папку reports как артефакт workflow.
+      - name: Upload reports artifact
         if: always()
-        uses: peaceiris/actions-gh-pages@v4
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}  # Авторизация для push в gh-pages
-          keep_files: true  # Сохраняем предыдущие отчёты
-          publish_dir: reports  # Публикуем директорию reports
-          publish_branch: gh-pages  # На ветке gh-pages
+          name: reports
+          path: reports
+          if-no-files-found: warn
 
       # 11. Корректно останавливаем docker-контейнеры и удаляем volume-ы (например, temp-файлы)
       - name: Stop test services
         if: always()
         run: docker compose -f docker-compose.ci.yaml down -v
         working-directory: performance-qa-engineer-course
+
+  # 11. Публикуем отчет в github pages.
+  publish-report:
+    runs-on: ubuntu-latest
+    needs: run-tests
+    if: always()
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Download reports artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: reports
+          path: reports
+
+      - name: Deploy HTML report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          keep_files: true
+          publish_dir: reports
+          publish_branch: gh-pages
