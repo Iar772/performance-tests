@@ -67,12 +67,24 @@ jobs:
       # 7. Создаём папку, куда будет сохранён HTML-отчёт по результатам теста
       - name: Create report directory
         run: mkdir -p ./reports/${{ github.run_id }}
+      # 8. Создаем переменные окружения
+      - name: Create .env for CI
+        run: |
+          cat > .env <<'EOF'
+          LOCUST_USER.WAIT_TIME_MIN=1
+          LOCUST_USER.WAIT_TIME_MAX=3
 
-      # 8. Запускаем Locust с выбранным конфигурационным файлом и сохраняем HTML-отчёт
+          GATEWAY_HTTP_CLIENT.URL=http://localhost:8080
+          GATEWAY_HTTP_CLIENT.TIMEOUT=100
+
+          GATEWAY_GRPC_CLIENT.HOST=localhost
+          GATEWAY_GRPC_CLIENT.PORT=9003
+          EOF
+      # 9. Запускаем Locust с выбранным конфигурационным файлом и сохраняем HTML-отчёт
       - name: Run load tests and generate HTML report
         run: locust --config=${{ github.event.inputs.SCENARIO }} --html=./reports/${{ github.run_id }}/index.html
 
-      # 9. Деплой HTML-отчёта в GitHub Pages, чтобы можно было посмотреть результаты в браузере
+      # 10. Деплой HTML-отчёта в GitHub Pages, чтобы можно было посмотреть результаты в браузере
       - name: Deploy HTML report to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
@@ -82,7 +94,7 @@ jobs:
           publish_dir: reports  # Публикуем директорию reports
           publish_branch: gh-pages  # На ветке gh-pages
 
-      # 10. Корректно останавливаем docker-контейнеры и удаляем volume-ы (например, temp-файлы)
+      # 11. Корректно останавливаем docker-контейнеры и удаляем volume-ы (например, temp-файлы)
       - name: Stop test services
         if: always()
         run: docker compose -f docker-compose.ci.yaml down -v
